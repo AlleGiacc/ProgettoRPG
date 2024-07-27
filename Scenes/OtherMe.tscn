@@ -1,0 +1,73 @@
+[gd_scene load_steps=11 format=3 uid="uid://dennteihbw3ko"]
+
+[ext_resource type="Script" path="res://Scripts/sign.gd" id="1_yqee4"]
+[ext_resource type="Texture2D" uid="uid://cauxh8dpbgdj2" path="res://Assets/characters/player.png" id="2_6evly"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_816e2"]
+size = Vector2(11, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tccwk"]
+atlas = ExtResource("2_6evly")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sanv1"]
+atlas = ExtResource("2_6evly")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwh08"]
+atlas = ExtResource("2_6evly")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cgk86"]
+atlas = ExtResource("2_6evly")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jg3t3"]
+atlas = ExtResource("2_6evly")
+region = Rect2(192, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hyj0d"]
+atlas = ExtResource("2_6evly")
+region = Rect2(240, 0, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pgetf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tccwk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sanv1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bwh08")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cgk86")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jg3t3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hyj0d")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}]
+
+[node name="OtherMe" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 6
+collision_mask = 2
+script = ExtResource("1_yqee4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, 1)
+shape = SubResource("RectangleShape2D_816e2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -11)
+sprite_frames = SubResource("SpriteFrames_pgetf")
+animation = &"idle"
+autoplay = "idle"

@@ -1,0 +1,11 @@
+join MC left [animation="Instant In" length="1.0"]
+join OtherMe right [animation="Instant In" length="1.0" wait="true"]
+MC: Chi sei tu...?
+...
+MC: Oh ma ci sei?
+...
+leave OtherMe [animation="Slide Out Left" length="1.0" wait="true"]
+join OtherMe right [animation="Slide In Right" length="1.0" wait="true"]
+MC: Ma respiri?
+OtherMe: No
+MC: Ma te sei scemo
