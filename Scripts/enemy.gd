@@ -1,83 +1,91 @@
 extends CharacterBody2D
 
+var body_to_chase
 var speed = 70
-var player_chase = false
-var player = null
 var status = "patrol"
-var starting_position = Vector2.ZERO
+var direction = 1
+var last_position
 @onready var animated_sprite_2d = $AnimatedSprite2D
 @onready var collision_polygon_2d = $DetectionArea/CollisionPolygon2D
-@onready var pathfollow = get_parent()
-var direction = 1
-var movement_velocity = Vector2.ZERO
-@onready var timer = $Timer
+@onready var pathfollow = get_parent() as PathFollow2D
 
 
 func _ready():
-	starting_position = position  # Imposta la posizione iniziale quando la scena viene avviata
+	animated_sprite_2d.play("walk")
+	last_position = global_position
 
 func _physics_process(delta):
 	match status:
-		"chase":
-			chase_player(delta)
 		"patrol":
 			patrol_path(delta)
+		"chase":
+			chasing(delta)
 		"return":
-			return_to_starting_position(delta)
-	
-	velocity = movement_velocity
+			return_to_path(delta)
+	print(status)
 	move_and_slide()
 
-func chase_player(delta):
-	if player:
-		collision_polygon_2d.look_at(player.position)
-		var direction = (player.global_position - global_position).normalized()
-		movement_velocity = direction * speed
-		if direction.x < 0:
-			animated_sprite_2d.flip_h = true
-		else:
-			animated_sprite_2d.flip_h = false
-
-func patrol_path(delta):
-	animated_sprite_2d.play("walk")
-	if direction == 1:
-		if pathfollow.progress_ratio == 1:
-			animated_sprite_2d.flip_h = true
-			collision_polygon_2d.rotation_degrees = 180
-			direction = 0
-		else:
-			pathfollow.progress += speed * delta
-	else:
-		if pathfollow.progress_ratio == 0:
-			animated_sprite_2d.flip_h = false
-			collision_polygon_2d.rotation_degrees = 0
-			direction = 1
-		else:
-			pathfollow.progress -= speed * delta
-	movement_velocity = Vector2.ZERO
-
-func return_to_starting_position(delta):
-	var direction = (starting_position - position).normalized()
-	movement_velocity = direction * speed
-	if position.distance_to(starting_position) < 1:
-		position = starting_position
+func return_to_path(delta):
+	var direction = (last_position - global_position).normalized()
+	velocity = direction * speed
+	if global_position.distance_to(last_position) < 1:
+		global_position = last_position
 		status = "patrol"
-	if (starting_position.x - position.x) < 0:
+	if (last_position.x - global_position.x) < 0:
 		animated_sprite_2d.flip_h = true
-		collision_polygon_2d.rotation_degrees = 180
 	else:
 		animated_sprite_2d.flip_h = false
-		collision_polygon_2d.rotation_degrees = 0
+	update_collision_polygon()
+
+func chasing(delta):
+	update_collision_polygon()
+	var direction = (body_to_chase.global_position - global_position).normalized()
+	velocity = direction * speed
+	if direction.x < 0:
+		animated_sprite_2d.flip_h = true
+	else:
+		animated_sprite_2d.flip_h = false
+
+func patrol_path(delta):
+	velocity = Vector2.ZERO
+	if direction == 1: # sto andando verso dx
+		if pathfollow.progress_ratio >= 1: # devo girarmi verso sx
+			direction = -1
+			animated_sprite_2d.flip_h = true
+		else: # devo far andare DX il nemico
+			pathfollow.set_progress(pathfollow.get_progress() + speed * delta)
+	else: # sto andando verso sx
+		if pathfollow.progress_ratio <= 0: # devo girarmi verso dx
+			direction = 1
+			animated_sprite_2d.flip_h = false
+		else: # devo far andare sx il nemico
+			pathfollow.set_progress(pathfollow.get_progress() - speed * delta)
+			
+	update_collision_polygon()
+
+func update_collision_polygon():
+	if status == "patrol":
+		var movement_direction = (global_position - last_position).normalized()
+		collision_polygon_2d.look_at(global_position + movement_direction)
+		last_position = global_position
+	elif status == "chase":
+		collision_polygon_2d.look_at(body_to_chase.global_position)
+	elif status == "return":
+		collision_polygon_2d.look_at(last_position)
 
 func _on_detection_area_body_entered(body):
 	if body is Player:
-		player = body
 		status = "chase"
-		animated_sprite_2d.play("walk")
-		print("Inseguimento")
+		body_to_chase = body
+		print("inseguimento")
 
 func _on_detection_area_body_exited(body):
 	if body is Player:
-		player = null
-		timer.start()
-		print("Ritorno")
+		velocity = Vector2.ZERO
+		status = "return"
+		body_to_chase = null
+		print("ritorno")
+
+
+func _on_collision_area_body_entered(body):
+	print("combattimento")
