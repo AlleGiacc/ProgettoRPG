@@ -4,6 +4,8 @@ extends CharacterBody2D
 const LEFT  : int = -1
 const RIGHT : int =  1
 
+var can_move			: bool
+
 var Name				: String
 var Speed 				: int
 var Status 				: String
@@ -37,6 +39,23 @@ func _physics_process(delta):
 		"idle":
 			patrol_path(delta)
 		"chase":
+			if ( can_move == false ):
+				# fai partire l'animazione del punto esclamativo
+				AnimatedSprite2d.play("approaching")							
+				# aspetta 1000 ms
+				await get_tree().create_timer(1).timeout
+				# ritorna alla velocità corretta	
+				if ( BodyToChase != null ):
+					# fai partire l'animazione dell'inseguimento
+					AnimatedSprite2d.play("walk")								
+				else:
+					# altrimenti lo fermi per un bel po'	
+					AnimatedSprite2d.play("idle")					
+					# TO-DO ---- fare parte in cui si arresta a causa di un errore -----------------
+					#-------------------------------------------------------------------------------
+				# deve eseguirsi solo una volta
+				can_move = true
+				
 			chasing(delta)
 		"return":
 			return_to_path(delta)
@@ -114,22 +133,9 @@ func update_collision_polygon():
 func _on_detection_area_body_entered(body):
 	# il Player è stato rilevato?
 	if body is Player:
-		# fai partire l'animazione del punto esclamativo
-		AnimatedSprite2d.play("approaching")		
-		var _playerDirection = (body.global_position - global_position).normalized()		
-		# annulla la velocità del nemico
-		var _oldSpeed = Speed 
-		Speed = 0 
-		velocity = _playerDirection * Speed
-		# aspetta 500 ms
-		await get_tree().create_timer(1).timeout
-		# ritorna alla velocità corretta	
-		Speed = _oldSpeed	
-		velocity = _playerDirection * Speed
-		# fai partire l'animazione dell'inseguimento
-		AnimatedSprite2d.play("walk")
 		# cambio lo stato
 		Status = "chase"
+		can_move = false
 		# so chi devo inseguire ora
 		BodyToChase = body
 
