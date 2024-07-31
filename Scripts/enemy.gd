@@ -153,4 +153,17 @@ func _on_collision_area_body_entered(body):
 	# il player ha avuto una interazione con me?
 	if body is Player:
 		# cambia lo stato
-		Status = "fight"	
+		Status = "fight"
+		_on_player_battle_start(false)
+
+#==============================================================================
+# meglio dividere in 2 funzioni? una che cattura il segnale a altra che fa logica?
+func _on_player_battle_start(attacked):
+	Status = "fight"
+	if attacked:
+		if Status == "chase":
+			print("battaglia normale")
+		else:
+			print("battaglia vantaggio")
+	else:
+		print("battaglia con svantaggio")

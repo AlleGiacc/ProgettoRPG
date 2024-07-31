@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name Player
 
+signal battle_start(attacked) # segnale inviato per iniziare battaglia con nemico dopo aver premuto space
+
 @onready var animated_sprite_2d = $AnimatedSprite2D
 
 ### VAR PER MOVIMENTO E SPRITE MOVIMENTO ### Volendo da cambiare con movimento smooth ma non per forza
@@ -20,7 +22,13 @@ func _physics_process(delta):
 	if canMove:
 		if Input.is_action_just_pressed("ACTION"):
 			execute_interaction()
-
+		
+		if Input.is_action_just_pressed("ATTACK"): #da sistemare ordine, ma dovrebbe andare
+			if all_interations:
+				var cur_interuction = all_interations[0]
+				if cur_interuction.interaction_type == "battle_start":
+					battle_start.emit(true)
+		
 		# Update velocity based on input
 		update_velocity(delta, directionLR, directionDU)
 
@@ -83,7 +91,6 @@ func execute_interaction():
 		match cur_interuction.interaction_type:
 			"Dialogic.start" : call_dialogic(cur_interuction.interaction_value)
 			"change_scene" : get_tree().change_scene_to_file(cur_interuction.interaction_value)
-			
 ###################################################################################################
 
 ### FUNZIONE PER GESTIONE DIALOGO #################################################################

@@ -1,7 +1,8 @@
-[gd_scene load_steps=21 format=3 uid="uid://bq6ap44pmiitr"]
+[gd_scene load_steps=22 format=3 uid="uid://bq6ap44pmiitr"]
 
 [ext_resource type="Script" path="res://Scripts/enemy.gd" id="1_0wy7h"]
 [ext_resource type="Texture2D" uid="uid://cro2sctpypxtf" path="res://Assets/characters/slime.png" id="1_7wk3b"]
+[ext_resource type="PackedScene" uid="uid://dmtdjis8gl5qr" path="res://Scenes/interaction_area.tscn" id="3_508yw"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v80be"]
 atlas = ExtResource("1_7wk3b")
@@ -161,6 +162,11 @@ shape = SubResource("CircleShape2D_7ytwo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_8i7r8")
+
+[node name="InteractionArea" parent="." instance=ExtResource("3_508yw")]
+interaction_label = ""
+interaction_type = "battle_start"
+interaction_value = ""
 
 [connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

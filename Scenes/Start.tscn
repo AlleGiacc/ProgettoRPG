@@ -360,3 +360,5 @@ progress = 46.8
 loop = false
 
 [node name="Enemy" parent="Path2D/PathFollow2D" instance=ExtResource("8_u4oqh")]
+
+[connection signal="battle_start" from="Player" to="Path2D/PathFollow2D/Enemy" method="_on_player_battle_start"]
